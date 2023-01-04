@@ -1,4 +1,4 @@
-# PSCertReqSignExportwSAN
+# PS Request Certificate PFX with SAN's and KEY - GUI
 
 Windows Certificate Management doesn't let you quickly create and export a certificate with several SAN's.
 There are some Powershell Modules, which make it easier and faster to get a certificate in a pfx-file, but I didn't has success to add SAN's in any of them.
