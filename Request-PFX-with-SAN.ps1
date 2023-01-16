@@ -139,8 +139,7 @@ $objOutDirLabel.Size = New-Object System.Drawing.Size(400,20)
 $objForm.Controls.Add($objOutDirLabel) 
 #--browse-button--#
 $BrowseButton.Add_Click({
-    $outdir = Get-Folder
-    $objOutDirLabel.Text = $outdir
+    $global:outdir = Get-Folder
     })
 
 $objForm.Controls.Add($BrowseButton) 
