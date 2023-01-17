@@ -137,17 +137,20 @@ $objOutDirLabel = New-Object System.Windows.Forms.Label
 $objOutDirLabel.Location = New-Object System.Drawing.Size(10,470)
 $objOutDirLabel.Size = New-Object System.Drawing.Size(400,20) 
 $objForm.Controls.Add($objOutDirLabel) 
-#--browse-button--#
-$BrowseButton.Add_Click({
-    $global:outdir = Get-Folder
-    })
 
-$objForm.Controls.Add($BrowseButton) 
 $objDirLabel = New-Object System.Windows.Forms.Label
 $objDirLabel.Location = New-Object System.Drawing.Size(10,450)
 $objDirLabel.Size = New-Object System.Drawing.Size(400,20)
-$objDirLabel.Text = "Selected output directory:"
+#$objDirLabel.Text = "-click `"Browse`" to select-"
 $objForm.Controls.Add($objDirLabel)
+#--browse-button--#
+$BrowseButton.Add_Click({
+    $global:outdir = Get-Folder
+    $objDirLabel.Text = $outdir
+    })
+
+$objForm.Controls.Add($BrowseButton) 
+
 
 #---Infotext/OpenSSL---#
 $objOpenSSL = New-Object System.Windows.Forms.Label
