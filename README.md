@@ -12,6 +12,9 @@ It costs ages to do all this steps manually - so this was my motivation to creat
 The GUI is created using Windows Forms (.NET Framework)
 See the comments in the script for more details.
 
+Script must run on a computer which is part of a domain with a CA server.
+Also make sure, you have sufficient permissions.
+
 Improvement ideas for future releases:
 
 -A file-picker for opensssl.exe
