@@ -54,7 +54,7 @@ Function Get-Folder($initialDirectory) {
         }
 
 # setting template entries for gui #
-$templates = "Webserver_1J","Printer","Computer","Device","Laptop","MobileDevice","Code_Signature","User"
+$templates = "Webserver","Printer","Computer","Laptop","Thinclient","MobileDevice","CodeSignature","User"
 
 # GUI script part begins here #
 
@@ -64,7 +64,7 @@ $templates = "Webserver_1J","Printer","Computer","Device","Laptop","MobileDevice
 $objForm = New-Object System.Windows.Forms.Form
 #$objForm.Backcolor=""
 $objForm.StartPosition = "CenterScreen"
-$objForm.Size = New-Object System.Drawing.Size(730,560)
+$objForm.Size = New-Object System.Drawing.Size(730,540)
 $objForm.Text = "Create CSR / Export Certificate"
 #---infotext/textbox---#
 $objLabel = New-Object System.Windows.Forms.Label
@@ -120,6 +120,17 @@ $objForm.Topmost = $True
 $objForm.Add_Shown({$objForm.Activate()})
 $objCAs.Items.AddRange($calist) #Issuing CAs will be loaded from variable and listed
 $objCAs.SelectedItem #select CA will now be applied
+#---infotext/own passphrase---#
+$objownpwdLabel = New-Object System.Windows.Forms.Label
+$objownpwdLabel.Location = New-Object System.Drawing.Size(440,320)
+$objownpwdLabel.Size = New-Object System.Drawing.Size(240,60)
+$objownpwdLabel.Text = "Enter a passphrase.`nIf empty, the script will use the hostname (without domain suffix) spelled backwards."
+$objForm.Controls.Add($objownpwdLabel)
+#---own passphrase---#
+$objownpwd = New-Object System.Windows.Forms.TextBox
+$objownpwd.Location = New-Object System.Drawing.Size(440,380)
+$objownpwd.Size = New-Object System.Drawing.Size(240,80)
+$objForm.Controls.Add($objownpwd)
 #--Infotext-output-folder--#
 $objOutDir = New-Object System.Windows.Forms.Label
 $objOutDir.Location = New-Object System.Drawing.Size(10,400)
@@ -163,10 +174,27 @@ $objOpenSSL.Text = "Note:
 If the operation fails, check Windows-EventLog on your CA-server"
 $objForm.Controls.Add($objOpenSSL)
 
+#---Infotext/Logo---#
+$objLogo = New-Object System.Windows.Forms.Label
+$objLogo.Location = New-Object System.Drawing.Size(530,60)
+$objLogo.Size = New-Object System.Drawing.Size(600,200)
+$objLogo.Text = " \|/
+-O-__________
+ /|\'.....................\
+ |'.......New.........|
+ |........Cert.........|
+ |........................|
+ |........................|
+ |........................|
+ |...........by  P.R.|
+ |____________|
+"
+$objForm.Controls.Add($objLogo)
+
 #--Create/Export Button--#
 $OKButton = New-Object System.Windows.Forms.Button
-$OKButton.Location = New-Object System.Drawing.Size(500,470)
-$OKButton.Size = New-Object System.Drawing.Size(85,23)
+$OKButton.Location = New-Object System.Drawing.Size(440,440)
+$OKButton.Size = New-Object System.Drawing.Size(90,23)
 $OKButton.Text = "Create/Export"
 $OKButton.Name = "Create/Export"
 $OKButton.Add_Click({
@@ -273,7 +301,8 @@ Invoke-Command -ComputerName $caserver -ScriptBlock {
     certreq -new "C:\Temp\$Using:shortname.inf" "C:\Temp\$Using:shortname.csr"
     }
 # creating target directory
-New-Item "$outdir\$shortname" -ItemType Directory
+$targetdir = "$outdir"+"\"+"$shortname"
+New-Item $targetdir -ItemType Directory
 
 # certificate request (CSR) will be signed by your CA, the received certificate will be saved in the destination directory
         
@@ -291,9 +320,21 @@ $global:thumb = $thumbprint.Thumbprint
 # Passphrase = hostname written backwards. 
 # The Passphrase will now be converted to a secure-string.
 # For OpenSSL, the clear-text password will be used, because OpenSSL doesn't recognize a secure-string.
-$global:pwd = $shortname
-$plainpwd = $pwd[-1..-$pwd.Length] -join ''
-$global:securepwd = convertto-securestring -String $plainpwd -asplaintext -force
+# If user typed in an own passphrase, it will be used.
+
+if ($objownpwd.Text -eq $null) {
+    $global:pwd = $shortname
+    $plainpwd = $pwd[-1..-$pwd.Length] -join ''
+    $global:securepwd = convertto-securestring -String $plainpwd -asplaintext -force
+    }
+    else
+    {
+    $global:ownpwd = $objownpwd.Text
+    $global:plainpwd = $ownpwd
+    $global:securepwd = convertto-securestring -String $plainpwd -asplaintext -force
+    $global:pwd = $ownpwd
+    }
+
 
 # The PFX file is now being saved and protected with the passphrase.
 $global:hostname = $env:computername
@@ -327,7 +368,7 @@ $objForm.Controls.Add($OKButton)
 
 #--Cancel-Button--#
 $CancelButton = New-Object System.Windows.Forms.Button
-$CancelButton.Location = New-Object System.Drawing.Size(600,470)
+$CancelButton.Location = New-Object System.Drawing.Size(605,440)
 $CancelButton.Size = New-Object System.Drawing.Size(75,23)
 $CancelButton.Text = "Quit"
 $CancelButton.Name = "Quit"
