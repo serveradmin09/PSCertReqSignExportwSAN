@@ -14,9 +14,6 @@ See the comments in the script for more details.
 
 Improvement ideas for future releases:
 
--A text-box for setting an own passphrase.
-  For now, the passphrase for the private key is the hostname, written backwards. My idea is to use a own passphrase if entered it in the textbox.
-
 -A file-picker for opensssl.exe
   If OpenSSL for Windows is not installed in the setup-default directory, the user is able to manually browse and pick the openssl.exe.
   
