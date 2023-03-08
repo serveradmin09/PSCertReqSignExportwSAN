@@ -33,3 +33,4 @@ Improvement ideas for future releases:
   Some anti-virus software solutions are alerting a virus when scanning the file if it is converted to an *.exe. I could solve this by signing my ps1-file.
   
 
+I recommend to convert the final script to .EXE with PS2EXE (https://github.com/MScholtes/PS2EXE - thanks!)
