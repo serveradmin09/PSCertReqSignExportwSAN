@@ -23,7 +23,7 @@ Improvement ideas for future releases:
 -More options for the certificate request INF-part
   For example: KeyLenght, ProviderName or HashAlgorithm TextFields for the user to adjust these settings. Maybe also to input manual OID's.
   
--ErrorLog / detailed error messages
+-ErrorLog / detailled error messages
   For easier problem solving if something dooesn't work
   
 -Supporting more OS-locales
