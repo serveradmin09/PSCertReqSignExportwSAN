@@ -6,7 +6,7 @@
 # the private key as KEY-File to your destination directory .                                  #
 # ---------------------------------------------------------------------------------------------#
 
-# checking if OpenSSL is installed #
+# checking if OpenSSL for Windows is installed #
 if (!(Test-Path "C:\Program Files\OpenSSL-Win64\bin\openssl.exe") -or (Test-Path "C:\Program Files (x86)\OpenSSL-Win32\bin\openssl.exe"))
     {
     [System.Windows.MessageBox]::Show('OpenSSL for Windows was not found in the setup-default directory. Please install OpenSSL first!','Warning')
@@ -54,6 +54,7 @@ Function Get-Folder($initialDirectory) {
         }
 
 # setting template entries for gui #
+# These are examples - put in the correct certificate template names from your ca server #
 $templates = "Webserver","Printer","Computer","Laptop","Thinclient","MobileDevice","CodeSignature","User"
 
 # GUI script part begins here #
@@ -175,6 +176,7 @@ If the operation fails, check Windows-EventLog on your CA-server"
 $objForm.Controls.Add($objOpenSSL)
 
 #---Infotext/Logo---#
+# this is just a flex. change the text to whatever you want :) #
 $objLogo = New-Object System.Windows.Forms.Label
 $objLogo.Location = New-Object System.Drawing.Size(530,60)
 $objLogo.Size = New-Object System.Drawing.Size(600,200)
@@ -191,7 +193,7 @@ $objLogo.Text = " \|/
 "
 $objForm.Controls.Add($objLogo)
 
-#--Create/Export Button--#
+#--Create/Export button--#
 $OKButton = New-Object System.Windows.Forms.Button
 $OKButton.Location = New-Object System.Drawing.Size(440,440)
 $OKButton.Size = New-Object System.Drawing.Size(90,23)
@@ -226,12 +228,13 @@ $OKButton.Add_Click({
     $global:san19 = $sans[18]
     $global:san20 = $sans[19]
 
-    # The script is creating now an CSR (Certificate Signing Request)
+    # The script is creating now a CSR (Certificate Signing Request)
     $csrPath = Join-Path -Path "$outdir" -ChildPath "$shortname.csr"
     $infPath = Join-Path -Path "$outdir" -ChildPath "$shortname.inf"
     $cerPath = $csrPath -replace ".csr" -replace ""
 
-    # Here begins the INF-file content art, which is necessary for the CSR.
+    # Here begins the INF-file content part, which is necessary for the CSR.
+    # If necessary, you can change the values like key length etc 
 
     $global:infContents =
 @"
@@ -304,21 +307,22 @@ Invoke-Command -ComputerName $caserver -ScriptBlock {
 $targetdir = "$outdir"+"\"+"$shortname"
 New-Item $targetdir -ItemType Directory
 
-# certificate request (CSR) will be signed by your CA, the received certificate will be saved in the destination directory
+# the CSR will be signed by your CA, the received certificate will be saved in the destination directory
         
 Invoke-Command -ComputerName $caserver -ScriptBlock { 
     certreq -submit -config "$using:ca" -attrib certificateTemplate:$Using:template "C:\Temp\$using:shortname.csr" "C:\Temp\$using:shortname.cer" 
     }
 
 # Importing the just created certificate to the ca-server under "my certificates".
+# You don't have to, but this is helpful if you monitor the certificates on your CA server to prevent them from expiring.
 # After then, key and cert will be exported as PFX to the destination folder.
-# Using the thumbprint (is unique), ther certificate can be retrieved from the server.
+# Using the thumbprint (is unique), the certificate can be retrieved from the server.
         
 $global:thumbprint = Invoke-Command -ComputerName $caserver -ScriptBlock { Import-Certificate -FilePath "C:\Temp\$using:shortname.cer" -Confirm:$false -CertStoreLocation "Cert:\LocalMachine\My" | Select-Object Thumbprint }
 $global:thumb = $thumbprint.Thumbprint
 
 # Passphrase = hostname written backwards. 
-# The Passphrase will now be converted to a secure-string.
+# The passphrase will now be converted to a secure-string.
 # For OpenSSL, the clear-text password will be used, because OpenSSL doesn't recognize a secure-string.
 # If user typed in an own passphrase, it will be used.
 
