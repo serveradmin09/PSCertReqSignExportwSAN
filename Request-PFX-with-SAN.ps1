@@ -9,6 +9,7 @@
 # checking if OpenSSL for Windows is installed #
 if (!(Test-Path "C:\Program Files\OpenSSL-Win64\bin\openssl.exe") -or (Test-Path "C:\Program Files (x86)\OpenSSL-Win32\bin\openssl.exe"))
     {
+    Add-Type -AssemblyName PresentationFramework
     [System.Windows.MessageBox]::Show('OpenSSL for Windows was not found in the setup-default directory. Please install OpenSSL first!','Warning')
     } 
     else {}
