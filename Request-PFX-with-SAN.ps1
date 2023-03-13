@@ -15,33 +15,31 @@ if (!(Test-Path "C:\Program Files\OpenSSL-Win64\bin\openssl.exe") -or (Test-Path
     else {}
 
 
-# checking current locale #
+# creating list of CA's - maximum is 5 #
+    $cadump = certutil -dump | select-string -Pattern 'onfig' 
+    $caentries = $cadump -split [System.Environment]::NewLine.ToCharArray()
+    if ($caentries[0]) {
+    $caserver1 = [regex]::match($caentries[0], '"([^"]+)"').Groups[1].Value
+    } else {}
+    if ($caentries[1]) {
+    $caserver2 = [regex]::match($caentries[1], '"([^"]+)"').Groups[1].Value
+    } else {}
+    if ($caentries[2]) {
+    $caserver3 = [regex]::match($caentries[2], '"([^"]+)"').Groups[1].Value
+    } else {}
+    if ($caentries[3]) {
+    $caserver4 = [regex]::match($caentries[3], '"([^"]+)"').Groups[1].Value
+    } else {}
+    if ($caentries[4]) {
+    $caserver5 = [regex]::match($caentries[4], '"([^"]+)"').Groups[1].Value
+    } else {}
 
-$locale = Get-WinSystemLocale
-if ($locale.Name -eq "de-AT")
-            {
-            $cadump = certutil -dump | select-string -Pattern Konfiguration 
-            $caentries = $cadump -replace "  Konfiguration:          	" -replace ""
-            }
-            else
-            {}
-
-if ($locale.Name -eq "de-DE")
-            {
-            $cadump = certutil -dump | select-string -Pattern Konfiguration 
-            $caentries = $cadump -replace "  Konfiguration:          	" -replace ""
-            }
-            else
-            {}
-if ($locale.Name -eq "en-US")
-            {
-            $cadump = certutil -dump | select-string -Pattern configuration 
-            $caentries = $cadump -replace "  configuration:          	" -replace ""
-            }
-            else
-            {}
-
-$calist = $caentries -replace "`"" -replace ""
+    if ($cadump.Count -eq 1) {$calist = $caserver1}
+    elseif ($cadump.Count -eq 2) {$calist = $caserver1,$caserver2}
+    elseif ($cadump.Count -eq 3) {$calist = $caserver1,$caserver2,$caserver3}
+    elseif ($cadump.Count -eq 4) {$calist = $caserver1,$caserver2,$caserver3,$caserver4}
+    elseif ($cadump.Count -eq 5) {$calist = $caserver1,$caserver2,$caserver3,$caserver4,$caserver5}
+    else {}
 
 # implementing Get-Folder function for output-directory picker #
 
