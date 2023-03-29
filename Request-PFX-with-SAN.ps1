@@ -325,7 +325,7 @@ $global:thumb = $thumbprint.Thumbprint
 # For OpenSSL, the clear-text password will be used, because OpenSSL doesn't recognize a secure-string.
 # If user typed in an own passphrase, it will be used.
 
-if ($objownpwd.Text -eq $null) {
+if (!$objownpwd.Text) {
     $global:pwd = $shortname
     $plainpwd = $pwd[-1..-$pwd.Length] -join ''
     $global:securepwd = convertto-securestring -String $plainpwd -asplaintext -force
@@ -337,7 +337,6 @@ if ($objownpwd.Text -eq $null) {
     $global:securepwd = convertto-securestring -String $plainpwd -asplaintext -force
     $global:pwd = $ownpwd
     }
-
 
 # The PFX file is now being saved and protected with the passphrase.
 $global:hostname = $env:computername
